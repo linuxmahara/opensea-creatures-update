@@ -1,1344 +1,180 @@
-Contribution: 2021-01-25 19:00
+## OpenSea Creatures - Starter ERC721, ERC1155, and factory contracts
 
-Contribution: 2021-01-25 18:01
+What's included:
 
-Contribution: 2021-01-25 17:02
+### Sample ERC721/ERC1155 Contracts
 
-Contribution: 2021-01-25 20:03
+This includes a very simple sample ERC721 / ERC1155 for the purposes of demonstrating integration with the [OpenSea](https://opensea.io) marketplace. We include a script for minting the items.
 
-Contribution: 2021-01-25 17:04
+Additionally, this contract whitelists the proxy accounts of OpenSea users so that they are automatically able to trade the ERC721 item on OpenSea (without having to pay gas for an additional approval). On OpenSea, each user has a "proxy" account that they control, and is ultimately called by the exchange contracts to trade their items. (Note that this addition does not mean that OpenSea itself has access to the items, simply that the users can list them more easily if they wish to do so)
 
-Contribution: 2021-01-25 19:05
+### Factory Contracts
 
-Contribution: 2021-01-25 18:06
+In addition to these template 721/1155 contracts, we provide sample factory contracts for running gas-free presales of items that haven't been minted yet. See https://docs.opensea.io/docs/opensea-initial-item-sale-tutorial for more info.
 
-Contribution: 2021-01-26 19:00
+## Requirements
 
-Contribution: 2021-01-26 17:01
+### Node version
 
-Contribution: 2021-01-26 17:02
+Either make sure you're running a version of node compliant with the `engines` requirement in `package.json`, or install Node Version Manager [`nvm`](https://github.com/creationix/nvm) and run `nvm use` to use the correct version of node.
 
-Contribution: 2021-01-26 21:03
+## Installation
 
-Contribution: 2021-01-26 18:04
+Run
 
-Contribution: 2021-01-26 17:05
+```bash
+yarn
+```
 
-Contribution: 2021-01-26 19:06
+If you run into an error while building the dependencies and you're on a Mac, run the code below, remove your `node_modules` folder, and do a fresh `yarn install`:
 
-Contribution: 2021-01-28 18:00
+```bash
+xcode-select --install # Install Command Line Tools if you haven't already.
+sudo xcode-select --switch /Library/Developer/CommandLineTools # Enable command line tools
+sudo npm explore npm -g -- npm install node-gyp@latest # Update node-gyp
+```
 
-Contribution: 2021-01-28 18:01
+## Deploying
 
-Contribution: 2021-01-28 17:02
+### Deploying to the Rinkeby network.
 
-Contribution: 2021-01-29 18:00
+0. Add test fundings to your Rinkeby testnet node on https://faucet.rinkeby.io
+1. To access a Rinkeby testnet node, you'll need to sign up for [Alchemy](https://dashboard.alchemyapi.io/signup?referral=affiliate:e535c3c3-9bc4-428f-8e27-4b70aa2e8ca5) and get a free API key. Click "View Key" and then copy the part of the URL after `v2/`.
+   a. You can use [Infura](https://infura.io) if you want as well. Just change `ALCHEMY_KEY` below to `INFURA_KEY`.
+2. Using your API key and the mnemonic for your Metamask wallet (make sure you're using a Metamask seed phrase that you're comfortable using for testing purposes), run:
 
-Contribution: 2021-01-29 20:01
+```
+export ALCHEMY_KEY="<your_alchemy_project_id>"
+export MNEMONIC="<metmask_mnemonic>"
+export DEPLOY_CREATURES_SALE=0 
+yarn truffle deploy --network rinkeby
+```
 
-Contribution: 2021-01-29 17:02
+### Minting tokens.
 
-Contribution: 2021-01-29 21:03
+After deploying to the Rinkeby network, there will be a contract on Rinkeby that will be viewable on [Rinkeby Etherscan](https://rinkeby.etherscan.io). For example, here is a [recently deployed contract](https://rinkeby.etherscan.io/address/0xeba05c5521a3b81e23d15ae9b2d07524bc453561). You should set this contract address and the address of your Metamask account as environment variables when running the minting script. If a [CreatureFactory was deployed](https://github.com/ProjectOpenSea/opensea-creatures/blob/master/migrations/2_deploy_contracts.js#L38), which the sample deploy steps above do, you'll need to specify its address below as it will be the owner on the NFT contract, and only it will have mint permissions. In that case, you won't need NFT_CONTRACT_ADDRESS, as all we need is the contract with mint permissions here.
 
-Contribution: 2021-01-29 19:04
+```
+export OWNER_ADDRESS="<my_address>"
+export NFT_CONTRACT_ADDRESS="<deployed_contract_address>"
+export FACTORY_CONTRACT_ADDRESS="<deployed_factory_contract_address>"
+export NETWORK="rinkeby"
+node scripts/mint.js
+```
 
-Contribution: 2021-01-29 18:05
+### Diagnosing Common Issues
 
-Contribution: 2021-01-29 21:06
+If you're running a modified version of `sell.js` and not getting expected behavior, check the following:
 
-Contribution: 2021-01-29 20:07
+- Is the `expirationTime` in future? If no, change it to a time in the future.
 
-Contribution: 2021-01-29 21:08
+- Is the `expirationTime` a fractional second? If yes, round the listing time to the nearest second.
 
-Contribution: 2021-01-29 19:09
+- Are the input addresses all strings? If no, convert them to strings.
 
-Contribution: 2021-02-01 17:00
+- Are the input addresses checksummed? You might need to use the checksummed version of the address.
 
-Contribution: 2021-02-01 17:01
+- Is your computer's internal clock accurate? If no, try enabling automatic clock adjustment locally or following [this tutorial](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/set-time.html) to update an Amazon EC2 instance.
 
-Contribution: 2021-02-01 20:02
+- Do you have any conflicts that result from globally installed node packages? If yes, try `yarn remove -g truffle; yarn`
 
-Contribution: 2021-02-01 18:03
+- Are you running a version of node compliant with the `engines` requirement in `package.json`? If no, try `nvm use; rm -rf node_modules; yarn`
 
-Contribution: 2021-02-01 20:04
+# About OpenSea Creature Accessories
 
-Contribution: 2021-02-01 19:05
+This is a sample ERC-1155 contract for the purposes of demonstrating integration with the [OpenSea](https://opensea.io) marketplace for crypto collectibles. We also include:
 
-Contribution: 2021-02-01 18:06
+- A factory contract for making sell orders for unminted items (allowing for **gas-free and mint-free presales**).
+- A configurable lootbox contract for selling randomized collections of ERC-1155 items.
 
-Contribution: 2021-02-01 20:07
+On top of the features from the OpenSea ERC721 sample contracts above, ERC1155
 
-Contribution: 2021-02-01 18:08
+- supports multiple creators per contract, where only the creator is able to mint more copies
+- supports pre-minted items for the lootbox to choose from
 
-Contribution: 2021-02-02 17:00
+## Configuring the Lootbox
 
-Contribution: 2021-02-02 19:01
+Open CreatureAccessoryLootbox.sol
 
-Contribution: 2021-02-02 18:02
+1. Change `Class` to reflect your rarity levels.
+2. Change `NUM_CLASSES` to reflect how many classes you have (this gets used for sizing fixed-length arrays in Solidity)
+3. In `constructor`, set the `OptionSettings` for each of your classes. To do this, as in the example, call `setOptionSettings` with
+   1. Your option id,
+   2. The number of items to issue when the box is opened,
+   3. An array of probabilities (basis points, so integers out of 10,000) of receiving each class. Should add up to 10k and be descending in value.
+4. Then follow the instructions below to deploy it! Purchases will auto-open the box. If you'd like to make lootboxes tradable by users (without a purchase auto-opening it), contact us at contact@opensea.io (or better yet, in [Discord](https://discord.gg/ga8EJbv)).
 
-Contribution: 2021-02-03 17:00
+## Why are some standard methods overridden?
 
-Contribution: 2021-02-03 18:01
+This contract overrides the `isApprovedForAll` method in order to whitelist the proxy accounts of OpenSea users. This means that they are automatically able to trade your ERC-1155 items on OpenSea (without having to pay gas for an additional approval). On OpenSea, each user has a "proxy" account that they control, and is ultimately called by the exchange contracts to trade their items.
 
-Contribution: 2021-02-03 19:02
+Note that this addition does not mean that OpenSea itself has access to the items, simply that the users can list them more easily if they wish to do so!
 
-Contribution: 2021-02-03 19:03
+# Requirements
 
-Contribution: 2021-02-04 21:00
+### Node version
 
-Contribution: 2021-02-04 17:01
+Either make sure you're running a version of node compliant with the `engines` requirement in `package.json`, or install Node Version Manager [`nvm`](https://github.com/creationix/nvm) and run `nvm use` to use the correct version of node.
 
-Contribution: 2021-02-04 18:02
+## Installation
 
-Contribution: 2021-02-04 19:03
+Run
 
-Contribution: 2021-02-05 20:00
+```bash
+yarn
+```
 
-Contribution: 2021-02-05 18:01
+## Deploying
 
-Contribution: 2021-02-05 17:02
+### Deploying to the Rinkeby network.
 
-Contribution: 2021-02-05 20:03
+1. Follow the steps above to get a Rinkeby node API key
+2. Using your API key and the mnemonic for your MetaMask wallet (make sure you're using a MetaMask seed phrase that you're comfortable using for testing purposes), run:
 
-Contribution: 2021-02-05 20:04
+```
+export ALCHEMY_KEY="<alchemy_project_id>" # or you can use INFURA_KEY
+export MNEMONIC="<metmask_mnemonic>"
+DEPLOY_ACCESSORIES_SALE=1 yarn truffle migrate --network rinkeby
+```
 
-Contribution: 2021-02-05 20:05
+### Deploying to the mainnet Ethereum network.
 
-Contribution: 2021-02-05 19:06
+Make sure your wallet has at least a few dollars worth of ETH in it. Then run:
 
-Contribution: 2021-02-05 21:07
+```
+yarn truffle migrate --network live
+```
 
-Contribution: 2021-02-09 20:00
+Look for your newly deployed contract address in the logs! 🥳
 
-Contribution: 2021-02-09 19:01
+### Viewing your items on OpenSea
 
-Contribution: 2021-02-09 19:02
+OpenSea will automatically pick up transfers on your contract. You can visit an asset by going to `https://opensea.io/assets/CONTRACT_ADDRESS/TOKEN_ID`.
 
-Contribution: 2021-02-09 19:03
+To load all your metadata on your items at once, visit [https://opensea.io/get-listed](https://opensea.io/get-listed) and enter your address to load the metadata into OpenSea! You can even do this for the Rinkeby test network if you deployed there, by going to [https://rinkeby.opensea.io/get-listed](https://rinkeby.opensea.io/get-listed).
 
-Contribution: 2021-02-09 18:04
+### Troubleshooting
 
-Contribution: 2021-02-09 17:05
+#### It doesn't compile!
 
-Contribution: 2021-02-09 21:06
+Install truffle locally: `yarn add truffle`. Then run `yarn truffle migrate ...`.
 
-Contribution: 2021-02-09 18:07
+You can also debug just the compile step by running `yarn truffle compile`.
 
-Contribution: 2021-02-09 18:08
+#### It doesn't deploy anything!
 
-Contribution: 2021-02-12 21:00
+This is often due to the truffle-hdwallet provider not being able to connect. Go to your [Alchemy Dashboard](https://dashboard.alchemyapi.io/signup?referral=affiliate:e535c3c3-9bc4-428f-8e27-4b70aa2e8ca5) (or infura.io) and create a new project. Use your "project ID" as your new `ALCHEMY_KEY` and make sure you export that command-line variable above.
 
-Contribution: 2021-02-12 17:01
+### ERC1155 Implementation
 
-Contribution: 2021-02-12 17:02
+To implement the ERC1155 standard, these contracts use the Multi Token Standard by [Horizon Games](https://horizongames.net/), available on [npm](https://www.npmjs.com/package/multi-token-standard) and [github](https://github.com/arcadeum/multi-token-standard) and also under the MIT License.
 
-Contribution: 2021-02-12 21:03
+# Running Local Tests
 
-Contribution: 2021-02-12 21:04
+In one terminal window, run:
 
-Contribution: 2021-02-12 20:05
+    yarn run ganache-cli
 
-Contribution: 2021-02-17 20:00
+Once Ganache has started, run the following in another terminal window:
 
-Contribution: 2021-02-17 18:01
-
-Contribution: 2021-02-17 19:02
-
-Contribution: 2021-02-17 19:03
-
-Contribution: 2021-02-17 20:04
-
-Contribution: 2021-02-17 21:05
-
-Contribution: 2021-02-17 21:06
-
-Contribution: 2021-02-22 17:00
-
-Contribution: 2021-02-24 21:00
-
-Contribution: 2021-02-25 20:00
-
-Contribution: 2021-02-25 19:01
-
-Contribution: 2021-02-25 18:02
-
-Contribution: 2021-02-25 18:03
-
-Contribution: 2021-02-25 20:04
-
-Contribution: 2021-02-25 17:05
-
-Contribution: 2021-02-25 21:06
-
-Contribution: 2021-02-25 19:07
-
-Contribution: 2021-02-25 20:08
-
-Contribution: 2021-03-01 21:00
-
-Contribution: 2021-03-01 17:01
-
-Contribution: 2021-03-01 18:02
-
-Contribution: 2021-03-01 20:03
-
-Contribution: 2021-03-01 20:04
-
-Contribution: 2021-03-05 18:00
-
-Contribution: 2021-03-05 17:01
-
-Contribution: 2021-03-05 20:02
-
-Contribution: 2021-03-05 19:03
-
-Contribution: 2021-03-05 20:04
-
-Contribution: 2021-03-05 20:05
-
-Contribution: 2021-03-05 21:06
-
-Contribution: 2021-03-05 19:07
-
-Contribution: 2021-03-05 18:08
-
-Contribution: 2021-03-05 19:09
-
-Contribution: 2021-03-09 17:00
-
-Contribution: 2021-03-09 17:01
-
-Contribution: 2021-03-09 20:02
-
-Contribution: 2021-03-09 21:03
-
-Contribution: 2021-03-09 17:04
-
-Contribution: 2021-03-10 21:00
-
-Contribution: 2021-03-10 19:01
-
-Contribution: 2021-03-11 20:00
-
-Contribution: 2021-03-11 21:01
-
-Contribution: 2021-03-11 21:02
-
-Contribution: 2021-03-11 17:03
-
-Contribution: 2021-03-11 17:04
-
-Contribution: 2021-03-11 21:05
-
-Contribution: 2021-03-11 20:06
-
-Contribution: 2021-03-11 20:07
-
-Contribution: 2021-03-11 20:08
-
-Contribution: 2021-03-15 18:00
-
-Contribution: 2021-03-15 17:01
-
-Contribution: 2021-03-15 20:02
-
-Contribution: 2021-03-15 20:03
-
-Contribution: 2021-03-15 17:04
-
-Contribution: 2021-03-15 21:05
-
-Contribution: 2021-03-15 18:06
-
-Contribution: 2021-03-15 17:07
-
-Contribution: 2021-03-15 18:08
-
-Contribution: 2021-03-15 17:09
-
-Contribution: 2021-03-22 17:00
-
-Contribution: 2021-03-22 17:01
-
-Contribution: 2021-03-22 21:02
-
-Contribution: 2021-03-22 21:03
-
-Contribution: 2021-03-22 21:04
-
-Contribution: 2021-03-22 17:05
-
-Contribution: 2021-03-23 17:00
-
-Contribution: 2021-03-23 20:01
-
-Contribution: 2021-03-23 21:02
-
-Contribution: 2021-03-23 18:03
-
-Contribution: 2021-03-23 21:04
-
-Contribution: 2021-03-23 21:05
-
-Contribution: 2021-03-23 17:06
-
-Contribution: 2021-03-25 20:00
-
-Contribution: 2021-03-25 17:01
-
-Contribution: 2021-03-25 20:02
-
-Contribution: 2021-03-25 18:03
-
-Contribution: 2021-03-25 18:04
-
-Contribution: 2021-03-25 20:05
-
-Contribution: 2021-03-25 21:06
-
-Contribution: 2021-03-25 17:07
-
-Contribution: 2021-03-25 18:08
-
-Contribution: 2021-03-25 21:09
-
-Contribution: 2021-03-26 18:00
-
-Contribution: 2021-03-26 17:01
-
-Contribution: 2021-03-26 17:02
-
-Contribution: 2021-04-01 18:00
-
-Contribution: 2021-04-01 18:01
-
-Contribution: 2021-04-01 17:02
-
-Contribution: 2021-04-01 20:03
-
-Contribution: 2021-04-01 18:04
-
-Contribution: 2021-04-01 20:05
-
-Contribution: 2021-04-06 21:00
-
-Contribution: 2021-04-06 20:01
-
-Contribution: 2021-04-06 17:02
-
-Contribution: 2021-04-06 18:03
-
-Contribution: 2021-04-07 21:00
-
-Contribution: 2021-04-07 19:01
-
-Contribution: 2021-04-07 21:02
-
-Contribution: 2021-04-08 20:00
-
-Contribution: 2021-04-08 20:01
-
-Contribution: 2021-04-12 21:00
-
-Contribution: 2021-04-12 18:01
-
-Contribution: 2021-04-12 17:02
-
-Contribution: 2021-04-12 19:03
-
-Contribution: 2021-04-12 21:04
-
-Contribution: 2021-04-12 18:05
-
-Contribution: 2021-04-13 19:00
-
-Contribution: 2021-04-13 20:01
-
-Contribution: 2021-04-13 20:02
-
-Contribution: 2021-04-13 21:03
-
-Contribution: 2021-04-13 18:04
-
-Contribution: 2021-04-15 19:00
-
-Contribution: 2021-04-15 20:01
-
-Contribution: 2021-04-15 21:02
-
-Contribution: 2021-04-15 19:03
-
-Contribution: 2021-04-15 19:04
-
-Contribution: 2021-04-15 19:05
-
-Contribution: 2021-04-15 17:06
-
-Contribution: 2021-04-20 21:00
-
-Contribution: 2021-04-20 19:01
-
-Contribution: 2021-04-20 18:02
-
-Contribution: 2021-04-20 19:03
-
-Contribution: 2021-04-20 19:04
-
-Contribution: 2021-04-20 20:05
-
-Contribution: 2021-04-20 18:06
-
-Contribution: 2021-04-20 21:07
-
-Contribution: 2021-04-23 20:00
-
-Contribution: 2021-04-23 17:01
-
-Contribution: 2021-04-23 20:02
-
-Contribution: 2021-04-27 19:00
-
-Contribution: 2021-04-27 17:01
-
-Contribution: 2021-04-27 20:02
-
-Contribution: 2021-04-27 17:03
-
-Contribution: 2021-04-27 18:04
-
-Contribution: 2021-04-27 18:05
-
-Contribution: 2021-04-27 20:06
-
-Contribution: 2021-04-27 17:07
-
-Contribution: 2021-04-27 20:08
-
-Contribution: 2021-04-27 17:09
-
-Contribution: 2021-05-04 19:00
-
-Contribution: 2021-05-07 17:00
-
-Contribution: 2021-05-12 18:00
-
-Contribution: 2021-05-17 18:00
-
-Contribution: 2021-05-17 18:01
-
-Contribution: 2021-05-19 21:00
-
-Contribution: 2021-05-19 21:01
-
-Contribution: 2021-05-19 21:02
-
-Contribution: 2021-05-19 19:03
-
-Contribution: 2021-05-24 21:00
-
-Contribution: 2021-05-24 18:01
-
-Contribution: 2021-05-24 18:02
-
-Contribution: 2021-05-24 21:03
-
-Contribution: 2021-05-24 18:04
-
-Contribution: 2021-05-24 21:05
-
-Contribution: 2021-05-25 18:00
-
-Contribution: 2021-05-25 21:01
-
-Contribution: 2021-05-25 21:02
-
-Contribution: 2021-05-25 18:03
-
-Contribution: 2021-05-25 19:04
-
-Contribution: 2021-05-25 18:05
-
-Contribution: 2021-05-25 20:06
-
-Contribution: 2021-05-25 18:07
-
-Contribution: 2021-05-28 21:00
-
-Contribution: 2021-05-28 17:01
-
-Contribution: 2021-05-28 18:02
-
-Contribution: 2021-05-28 17:03
-
-Contribution: 2021-05-28 20:04
-
-Contribution: 2021-05-28 19:05
-
-Contribution: 2021-05-28 17:06
-
-Contribution: 2021-05-31 19:00
-
-Contribution: 2021-05-31 17:01
-
-Contribution: 2021-05-31 20:02
-
-Contribution: 2021-05-31 17:03
-
-Contribution: 2021-06-03 19:00
-
-Contribution: 2021-06-03 18:01
-
-Contribution: 2021-06-03 18:02
-
-Contribution: 2021-06-03 20:03
-
-Contribution: 2021-06-03 21:04
-
-Contribution: 2021-06-04 19:00
-
-Contribution: 2021-06-04 20:01
-
-Contribution: 2021-06-04 17:02
-
-Contribution: 2021-06-04 18:03
-
-Contribution: 2021-06-04 20:04
-
-Contribution: 2021-06-04 21:05
-
-Contribution: 2021-06-04 19:06
-
-Contribution: 2021-06-07 17:00
-
-Contribution: 2021-06-07 18:01
-
-Contribution: 2021-06-07 19:02
-
-Contribution: 2021-06-07 20:03
-
-Contribution: 2021-06-07 21:04
-
-Contribution: 2021-06-07 21:05
-
-Contribution: 2021-06-07 19:06
-
-Contribution: 2021-06-07 21:07
-
-Contribution: 2021-06-14 17:00
-
-Contribution: 2021-06-15 20:00
-
-Contribution: 2021-06-15 20:01
-
-Contribution: 2021-06-15 21:02
-
-Contribution: 2021-06-15 19:03
-
-Contribution: 2021-06-15 20:04
-
-Contribution: 2021-06-15 21:05
-
-Contribution: 2021-06-15 19:06
-
-Contribution: 2021-06-15 19:07
-
-Contribution: 2021-06-16 21:00
-
-Contribution: 2021-06-16 21:01
-
-Contribution: 2021-06-18 17:00
-
-Contribution: 2021-06-18 17:01
-
-Contribution: 2021-06-18 21:02
-
-Contribution: 2021-06-18 21:03
-
-Contribution: 2021-06-18 19:04
-
-Contribution: 2021-06-24 20:00
-
-Contribution: 2021-06-28 20:00
-
-Contribution: 2021-06-28 21:01
-
-Contribution: 2021-06-28 21:02
-
-Contribution: 2021-06-28 17:03
-
-Contribution: 2021-06-28 17:04
-
-Contribution: 2021-06-28 20:05
-
-Contribution: 2021-06-30 20:00
-
-Contribution: 2021-06-30 21:01
-
-Contribution: 2021-06-30 18:02
-
-Contribution: 2021-06-30 21:03
-
-Contribution: 2021-06-30 20:04
-
-Contribution: 2021-06-30 21:05
-
-Contribution: 2021-06-30 17:06
-
-Contribution: 2021-06-30 20:07
-
-Contribution: 2021-07-05 20:00
-
-Contribution: 2021-07-05 20:01
-
-Contribution: 2021-07-05 21:02
-
-Contribution: 2021-07-05 18:03
-
-Contribution: 2021-07-06 18:00
-
-Contribution: 2021-07-06 17:01
-
-Contribution: 2021-07-06 18:02
-
-Contribution: 2021-07-06 17:03
-
-Contribution: 2021-07-06 20:04
-
-Contribution: 2021-07-07 20:00
-
-Contribution: 2021-07-07 21:01
-
-Contribution: 2021-07-07 21:02
-
-Contribution: 2021-07-07 20:03
-
-Contribution: 2021-07-07 19:04
-
-Contribution: 2021-07-07 20:05
-
-Contribution: 2021-07-12 18:00
-
-Contribution: 2021-07-12 21:01
-
-Contribution: 2021-07-12 19:02
-
-Contribution: 2021-07-12 20:03
-
-Contribution: 2021-07-12 19:04
-
-Contribution: 2021-07-12 21:05
-
-Contribution: 2021-07-13 19:00
-
-Contribution: 2021-07-13 21:01
-
-Contribution: 2021-07-13 18:02
-
-Contribution: 2021-07-13 21:03
-
-Contribution: 2021-07-13 19:04
-
-Contribution: 2021-07-13 20:05
-
-Contribution: 2021-07-14 18:00
-
-Contribution: 2021-07-14 21:01
-
-Contribution: 2021-07-14 17:02
-
-Contribution: 2021-07-14 20:03
-
-Contribution: 2021-07-14 19:04
-
-Contribution: 2021-07-14 21:05
-
-Contribution: 2021-07-14 21:06
-
-Contribution: 2021-07-15 21:00
-
-Contribution: 2021-07-15 21:01
-
-Contribution: 2021-07-15 21:02
-
-Contribution: 2021-07-19 18:00
-
-Contribution: 2021-07-19 18:01
-
-Contribution: 2021-07-19 21:02
-
-Contribution: 2021-07-19 19:03
-
-Contribution: 2021-07-22 17:00
-
-Contribution: 2021-07-23 17:00
-
-Contribution: 2021-07-23 21:01
-
-Contribution: 2021-07-23 18:02
-
-Contribution: 2021-07-23 19:03
-
-Contribution: 2021-07-23 17:04
-
-Contribution: 2021-07-23 21:05
-
-Contribution: 2021-07-28 17:00
-
-Contribution: 2021-07-28 20:01
-
-Contribution: 2021-07-28 17:02
-
-Contribution: 2021-07-28 21:03
-
-Contribution: 2021-07-28 19:04
-
-Contribution: 2021-07-28 20:05
-
-Contribution: 2021-07-30 17:00
-
-Contribution: 2021-07-30 19:01
-
-Contribution: 2021-07-30 21:02
-
-Contribution: 2021-07-30 21:03
-
-Contribution: 2021-07-30 19:04
-
-Contribution: 2021-08-02 17:00
-
-Contribution: 2021-08-02 17:01
-
-Contribution: 2021-08-02 20:02
-
-Contribution: 2021-08-02 20:03
-
-Contribution: 2021-08-03 21:00
-
-Contribution: 2021-08-03 19:01
-
-Contribution: 2021-08-03 17:02
-
-Contribution: 2021-08-03 18:03
-
-Contribution: 2021-08-03 20:04
-
-Contribution: 2021-08-03 20:05
-
-Contribution: 2021-08-04 17:00
-
-Contribution: 2021-08-04 17:01
-
-Contribution: 2021-08-04 20:02
-
-Contribution: 2021-08-05 19:00
-
-Contribution: 2021-08-05 20:01
-
-Contribution: 2021-08-05 17:02
-
-Contribution: 2021-08-05 17:03
-
-Contribution: 2021-08-05 18:04
-
-Contribution: 2021-08-05 17:05
-
-Contribution: 2021-08-06 20:00
-
-Contribution: 2021-08-06 20:01
-
-Contribution: 2021-08-09 17:00
-
-Contribution: 2021-08-09 19:01
-
-Contribution: 2021-08-09 19:02
-
-Contribution: 2021-08-09 18:03
-
-Contribution: 2021-08-09 21:04
-
-Contribution: 2021-08-09 20:05
-
-Contribution: 2021-08-09 21:06
-
-Contribution: 2021-08-09 20:07
-
-Contribution: 2021-08-13 20:00
-
-Contribution: 2021-08-13 20:01
-
-Contribution: 2021-08-13 18:02
-
-Contribution: 2021-08-13 19:03
-
-Contribution: 2021-08-13 18:04
-
-Contribution: 2021-08-13 18:05
-
-Contribution: 2021-08-13 18:06
-
-Contribution: 2021-08-13 18:07
-
-Contribution: 2021-08-13 20:08
-
-Contribution: 2021-08-13 19:09
-
-Contribution: 2021-08-18 21:00
-
-Contribution: 2021-08-18 21:01
-
-Contribution: 2021-08-18 19:02
-
-Contribution: 2021-08-18 18:03
-
-Contribution: 2021-08-18 18:04
-
-Contribution: 2021-08-18 19:05
-
-Contribution: 2021-08-18 19:06
-
-Contribution: 2021-08-18 17:07
-
-Contribution: 2021-08-18 20:08
-
-Contribution: 2021-08-18 18:09
-
-Contribution: 2021-08-19 18:00
-
-Contribution: 2021-08-19 18:01
-
-Contribution: 2021-08-19 19:02
-
-Contribution: 2021-08-19 18:03
-
-Contribution: 2021-08-19 21:04
-
-Contribution: 2021-08-19 20:05
-
-Contribution: 2021-08-19 18:06
-
-Contribution: 2021-08-19 18:07
-
-Contribution: 2021-08-19 19:08
-
-Contribution: 2021-08-20 21:00
-
-Contribution: 2021-08-20 21:01
-
-Contribution: 2021-08-23 20:00
-
-Contribution: 2021-08-23 21:01
-
-Contribution: 2021-08-23 19:02
-
-Contribution: 2021-08-23 21:03
-
-Contribution: 2021-08-23 21:04
-
-Contribution: 2021-08-23 19:05
-
-Contribution: 2021-08-23 17:06
-
-Contribution: 2021-08-24 21:00
-
-Contribution: 2021-08-24 20:01
-
-Contribution: 2021-08-24 21:02
-
-Contribution: 2021-08-24 19:03
-
-Contribution: 2021-08-24 21:04
-
-Contribution: 2021-08-24 21:05
-
-Contribution: 2021-08-24 17:06
-
-Contribution: 2021-08-24 18:07
-
-Contribution: 2021-08-24 20:08
-
-Contribution: 2021-08-24 21:09
-
-Contribution: 2021-08-31 20:00
-
-Contribution: 2021-08-31 21:01
-
-Contribution: 2021-09-02 21:00
-
-Contribution: 2021-09-02 18:01
-
-Contribution: 2021-09-03 19:00
-
-Contribution: 2021-09-03 21:01
-
-Contribution: 2021-09-03 18:02
-
-Contribution: 2021-09-03 18:03
-
-Contribution: 2021-09-03 18:04
-
-Contribution: 2021-09-08 19:00
-
-Contribution: 2021-09-08 20:01
-
-Contribution: 2021-09-08 20:02
-
-Contribution: 2021-09-08 20:03
-
-Contribution: 2021-09-08 20:04
-
-Contribution: 2021-09-08 18:05
-
-Contribution: 2021-09-08 19:06
-
-Contribution: 2021-09-08 19:07
-
-Contribution: 2021-09-08 18:08
-
-Contribution: 2021-09-08 17:09
-
-Contribution: 2021-09-13 21:00
-
-Contribution: 2021-09-13 20:01
-
-Contribution: 2021-09-13 19:02
-
-Contribution: 2021-09-13 20:03
-
-Contribution: 2021-09-13 21:04
-
-Contribution: 2021-09-13 21:05
-
-Contribution: 2021-09-13 17:06
-
-Contribution: 2021-09-13 21:07
-
-Contribution: 2021-09-13 21:08
-
-Contribution: 2021-09-13 20:09
-
-Contribution: 2021-09-17 18:00
-
-Contribution: 2021-09-17 17:01
-
-Contribution: 2021-09-17 17:02
-
-Contribution: 2021-09-17 21:03
-
-Contribution: 2021-09-17 17:04
-
-Contribution: 2021-09-17 20:05
-
-Contribution: 2021-09-22 19:00
-
-Contribution: 2021-09-22 20:01
-
-Contribution: 2021-09-22 20:02
-
-Contribution: 2021-09-22 19:03
-
-Contribution: 2021-09-22 18:04
-
-Contribution: 2021-09-22 19:05
-
-Contribution: 2021-09-22 20:06
-
-Contribution: 2021-09-22 21:07
-
-Contribution: 2021-09-22 17:08
-
-Contribution: 2021-09-24 19:00
-
-Contribution: 2021-09-24 17:01
-
-Contribution: 2021-09-24 17:02
-
-Contribution: 2021-09-24 19:03
-
-Contribution: 2021-09-24 20:04
-
-Contribution: 2021-09-24 21:05
-
-Contribution: 2021-09-24 21:06
-
-Contribution: 2021-09-29 20:00
-
-Contribution: 2021-09-29 17:01
-
-Contribution: 2021-09-29 21:02
-
-Contribution: 2021-09-29 20:03
-
-Contribution: 2021-09-29 21:04
-
-Contribution: 2021-09-30 18:00
-
-Contribution: 2021-10-07 17:00
-
-Contribution: 2021-10-07 20:01
-
-Contribution: 2021-10-07 21:02
-
-Contribution: 2021-10-08 20:00
-
-Contribution: 2021-10-08 18:01
-
-Contribution: 2021-10-08 20:02
-
-Contribution: 2021-10-08 18:03
-
-Contribution: 2021-10-08 18:04
-
-Contribution: 2021-10-08 17:05
-
-Contribution: 2021-10-08 18:06
-
-Contribution: 2021-10-08 21:07
-
-Contribution: 2021-10-12 17:00
-
-Contribution: 2021-10-12 19:01
-
-Contribution: 2021-10-12 19:02
-
-Contribution: 2021-10-15 19:00
-
-Contribution: 2021-10-15 18:01
-
-Contribution: 2021-10-18 19:00
-
-Contribution: 2021-10-18 21:01
-
-Contribution: 2021-10-18 17:02
-
-Contribution: 2021-10-19 17:00
-
-Contribution: 2021-10-19 21:01
-
-Contribution: 2021-10-19 20:02
-
-Contribution: 2021-10-19 20:03
-
-Contribution: 2021-10-19 17:04
-
-Contribution: 2021-10-19 20:05
-
-Contribution: 2021-10-19 21:06
-
-Contribution: 2021-10-19 18:07
-
-Contribution: 2021-10-25 17:00
-
-Contribution: 2021-10-26 17:00
-
-Contribution: 2021-10-26 18:01
-
-Contribution: 2021-10-26 21:02
-
-Contribution: 2021-10-26 17:03
-
-Contribution: 2021-11-03 18:00
-
-Contribution: 2021-11-03 21:01
-
-Contribution: 2021-11-03 17:02
-
-Contribution: 2021-11-03 20:03
-
-Contribution: 2021-11-03 19:04
-
-Contribution: 2021-11-03 20:05
-
-Contribution: 2021-11-03 19:06
-
-Contribution: 2021-11-03 19:07
-
-Contribution: 2021-11-03 19:08
-
-Contribution: 2021-11-04 18:00
-
-Contribution: 2021-11-04 19:01
-
-Contribution: 2021-11-04 19:02
-
-Contribution: 2021-11-04 19:03
-
-Contribution: 2021-11-04 17:04
-
-Contribution: 2021-11-04 17:05
-
-Contribution: 2021-11-04 20:06
-
-Contribution: 2021-11-04 20:07
-
-Contribution: 2021-11-04 19:08
-
-Contribution: 2021-11-05 18:00
-
-Contribution: 2021-11-12 19:00
-
-Contribution: 2021-11-12 19:01
-
-Contribution: 2021-11-12 17:02
-
-Contribution: 2021-11-12 20:03
-
-Contribution: 2021-11-17 20:00
-
-Contribution: 2021-11-17 18:01
-
-Contribution: 2021-11-17 21:02
-
-Contribution: 2021-11-18 19:00
-
-Contribution: 2021-11-18 20:01
-
-Contribution: 2021-11-18 18:02
-
-Contribution: 2021-11-18 18:03
-
-Contribution: 2021-11-18 18:04
-
-Contribution: 2021-11-18 19:05
-
-Contribution: 2021-11-18 17:06
-
-Contribution: 2021-11-18 21:07
-
-Contribution: 2021-11-18 19:08
-
-Contribution: 2021-11-18 21:09
-
-Contribution: 2021-11-23 18:00
-
-Contribution: 2021-11-23 19:01
-
-Contribution: 2021-11-25 17:00
-
-Contribution: 2021-11-25 19:01
-
-Contribution: 2021-11-25 20:02
-
-Contribution: 2021-11-25 17:03
-
-Contribution: 2021-11-25 18:04
-
-Contribution: 2021-11-25 21:05
-
-Contribution: 2021-11-25 18:06
-
-Contribution: 2021-11-25 20:07
-
-Contribution: 2021-11-25 19:08
-
-Contribution: 2021-11-25 19:09
-
-Contribution: 2021-12-07 20:00
-
-Contribution: 2021-12-07 18:01
-
-Contribution: 2021-12-07 18:02
-
-Contribution: 2021-12-07 19:03
-
-Contribution: 2021-12-07 17:04
-
-Contribution: 2021-12-07 17:05
-
-Contribution: 2021-12-07 19:06
-
-Contribution: 2021-12-08 20:00
-
-Contribution: 2021-12-09 20:00
-
-Contribution: 2021-12-09 18:01
-
-Contribution: 2021-12-09 21:02
-
-Contribution: 2021-12-09 18:03
-
-Contribution: 2021-12-09 19:04
-
-Contribution: 2021-12-09 21:05
-
-Contribution: 2021-12-14 19:00
-
-Contribution: 2021-12-14 19:01
-
-Contribution: 2021-12-14 19:02
-
-Contribution: 2021-12-14 19:03
-
-Contribution: 2021-12-14 18:04
-
-Contribution: 2021-12-14 17:05
-
-Contribution: 2021-12-14 20:06
-
-Contribution: 2021-12-14 19:07
-
-Contribution: 2021-12-15 20:00
-
-Contribution: 2021-12-15 21:01
-
-Contribution: 2021-12-15 21:02
-
-Contribution: 2021-12-22 21:00
-
-Contribution: 2021-12-22 18:01
-
-Contribution: 2021-12-27 21:00
-
-Contribution: 2021-12-27 17:01
-
-Contribution: 2021-12-27 18:02
-
-Contribution: 2021-12-27 18:03
-
-Contribution: 2021-12-28 21:00
-
-Contribution: 2021-12-28 21:01
-
-Contribution: 2021-12-28 18:02
-
-Contribution: 2021-12-28 19:03
-
-Contribution: 2021-12-28 19:04
-
-Contribution: 2021-12-28 21:05
-
-Contribution: 2021-12-28 20:06
-
-Contribution: 2021-12-28 18:07
-
-Contribution: 2021-12-30 20:00
-
-Contribution: 2021-12-30 18:01
-
-Contribution: 2021-12-30 17:02
-
-Contribution: 2021-12-30 17:03
-
-Contribution: 2021-12-30 21:04
-
-Contribution: 2021-12-30 18:05
-
-Contribution: 2021-12-30 17:06
-
-Contribution: 2021-12-30 19:07
-
-Contribution: 2021-12-30 17:08
-
-Contribution: 2021-12-31 20:00
-
-Contribution: 2021-12-31 21:01
-
-Contribution: 2021-12-31 17:02
-
-Contribution: 2021-12-31 18:03
-
-Contribution: 2021-12-31 21:04
-
-Contribution: 2021-12-31 18:05
-
-Contribution: 2021-12-31 18:06
-
-Contribution: 2021-12-31 18:07
-
-Contribution: 2021-12-31 17:08
-
-Contribution: 2022-01-07 18:00
-
-Contribution: 2022-01-07 17:01
-
-Contribution: 2022-01-07 17:02
-
-Contribution: 2022-01-07 17:03
-
-Contribution: 2022-01-07 17:04
-
-Contribution: 2022-01-10 21:00
-
-Contribution: 2022-01-10 21:01
-
-Contribution: 2022-01-10 19:02
-
-Contribution: 2022-01-10 17:03
-
-Contribution: 2022-01-10 20:04
-
-Contribution: 2022-01-10 18:05
-
-Contribution: 2022-01-10 21:06
-
-Contribution: 2022-01-10 17:07
-
-Contribution: 2022-01-10 18:08
-
-Contribution: 2022-01-11 19:00
-
-Contribution: 2022-01-11 18:01
-
-Contribution: 2022-01-11 21:02
-
-Contribution: 2022-01-11 21:03
-
-Contribution: 2022-01-11 20:04
-
-Contribution: 2022-01-11 19:05
-
-Contribution: 2022-01-11 18:06
-
-Contribution: 2022-01-11 18:07
-
-Contribution: 2022-01-11 17:08
-
-Contribution: 2022-01-13 17:00
-
-Contribution: 2022-01-13 18:01
-
-Contribution: 2022-01-13 17:02
-
-Contribution: 2022-01-13 17:03
-
-Contribution: 2022-01-13 20:04
-
-Contribution: 2022-01-13 20:05
-
-Contribution: 2022-01-13 17:06
-
-Contribution: 2022-01-13 20:07
-
-Contribution: 2022-01-13 18:08
-
-Contribution: 2022-01-13 17:09
-
-Contribution: 2022-01-14 17:00
-
-Contribution: 2022-01-14 19:01
-
-Contribution: 2022-01-14 20:02
-
-Contribution: 2022-01-14 17:03
-
-Contribution: 2022-01-14 20:04
-
-Contribution: 2022-01-14 17:05
-
-Contribution: 2022-01-17 19:00
-
-Contribution: 2022-01-17 20:01
-
-Contribution: 2022-01-17 17:02
-
-Contribution: 2022-01-17 21:03
-
-Contribution: 2022-01-17 21:04
-
-Contribution: 2022-01-17 17:05
-
-Contribution: 2022-01-17 20:06
-
-Contribution: 2022-01-17 19:07
-
-Contribution: 2022-01-17 21:08
-
+    yarn run test
